@@ -1,0 +1,8 @@
+#include <ctype.hmm>
+
+// 16進数字か？
+public boolean isXdigit(char c) {
+  return isDigit(c) ||
+         ord('A')<=ord(c) && ord(c)<=ord('F') ||
+         ord('a')<=ord(c) && ord(c)<=ord('f');
+}

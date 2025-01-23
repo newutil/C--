@@ -1,0 +1,36 @@
+#include "stdlibUtil.hmm"
+
+// メモリを割り付ける
+public void[] malloc(int siz) {                 // メモリ割り当て
+  int s = (siz + MBSIZE + 1) & ~1;              // 制御データ分大きい偶数に
+  MemBlk p = _memPool;                           // 直前の領域
+  MemBlk m = p.next;                            // 対象となる領域
+
+  while (_uCmp(m.size, s)<0) {                  // 領域が小さい間
+    p = m;                                      // リストを手繰る
+    m = m.next;
+    if (m==null) _exit(EUNOMEM);                // 領域が見つからない
+  }
+
+  if (_uCmp(m.size, s+MBSIZE+2)<=0) {           // 分割する価値がない領域で
+    if (m.next==null) _exit(EUNOMEM);           //   リストが維持できない
+    s = m.size;                                 // 領域全体を使用する
+  }
+
+  MemBlk n = _addrAdd(m, s);                    // 割り当てる領域の後端
+  if (_aCmp(n, _iToA(_sp()-10))>=0)             // ヒープ残りが10バイト以下なら
+    _exit(EUNOMEM);                             //   エラー終了
+
+  if (s==m.size) {                              // 領域を分割しない
+    p.next = m.next;
+  } else {                                      // 領域を分割する
+    n.next = m.next;
+    n.size = m.size - s;                        // 残り領域のサイズ
+    p.next = n;
+    m.size = s;
+  }
+  m.next = MAGIC;                               // マジックナンバー格納
+
+  if (_aCmp(n, _alcAddr)>0) _alcAddr = n;       // ヒープの後端を更新
+  return _addrAdd(m, MBSIZE);                   // 管理領域を除いて返す
+}

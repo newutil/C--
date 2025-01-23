@@ -1,0 +1,14 @@
+#include "environUtil.hmm"
+
+// environ 中のインデックスを返す。存在しなければ環境変数の個数を返す
+// 存在しなければ、 environ[_envIndex(name, len)] == null になる
+public int _envIndex(char[] name, int len) {
+  int i = 0;
+  for (; environ[i] != null; i = i + 1) {
+    int nameLen = strChr(environ[i], '=');
+    if (len == nameLen && strNcmp(environ[i], name, len) == 0) {
+      return i;
+    }
+  }
+  return i;
+}

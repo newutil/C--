@@ -1,0 +1,40 @@
+*** 定数 ***
+
+*** BSSセグメント ***
+
+*** ヘッダ ***
+magic = 0107
+text  = 0006
+data  = 0000
+bss   = 0000
+syms  = 000c
+entry = 0000
+trsize= 0004
+drsize= 0000
+
+*** TEXTセグメント ***
+0000          	_sleep
+0000 0d03     	        ld      g0,#3           ; G0 にシステムコール番号を格納
+0002 a0f0 0000	        jmp     _l1
+
+*** DATAセグメント ***
+
+*** 再配置表 ***
+TR領域
+Addr	Name	Type	No.
+0004	_l1	UNDF	  2
+
+DR領域
+Addr	Name	Type	No.
+
+*** 名前表 ***
+No.	Name	Type	Value	Offset
+0	@_sleep.s	TEXT	0000	0000
+1	_sleep	TEXT	0000	000a
+2	_l1	UNDF	0000	0011
+
+*** 文字列表 ***
+Offset	String
+0000	@_sleep.s
+000a	_sleep
+0011	_l1

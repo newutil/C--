@@ -1,0 +1,10 @@
+// 文字数制限付きの文字列結合（n文字未満を追加）
+public char[] strNcat(char[] d, char[] s, int n) {
+  int i=0;
+  while (d[i]!='\0')
+    i=i+1;
+  for (int j=0; j<n-1 && s[j]!='\0'; i=i+1,j=j+1)
+    d[i]=s[j];
+  d[i]='\0';
+  return d;
+}

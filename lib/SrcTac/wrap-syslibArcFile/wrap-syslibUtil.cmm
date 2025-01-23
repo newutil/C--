@@ -1,0 +1,12 @@
+#include "wrap-syslibUtil.hmm"
+#define BUF 80
+
+// path を絶対パスに変換して返す。呼び出し側で free() する必要がある。
+public char[] _newAbsPath(char[] path) {
+  char[] buf = cMalloc(BUF);
+  if (absPath(path, buf, BUF)) {
+    free(buf);
+    buf = null;
+  }
+  return buf;
+}

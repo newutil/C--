@@ -1,0 +1,4 @@
+// 数字か？
+public boolean isDigit(char c) {
+  return ord('0')<=ord(c) && ord(c)<=ord('9');
+}

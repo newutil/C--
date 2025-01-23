@@ -1,0 +1,9 @@
+#include "stdioUtil.hmm"
+
+// exit が使用する
+public void _flushAll() {
+  for (int i=0; i<3+FMAX; i=i+1) {
+    FILE fp = _allFiles[i];
+    if (fp!=null && fp.mode!=O_RDONLY) fflush(fp);
+  }
+}

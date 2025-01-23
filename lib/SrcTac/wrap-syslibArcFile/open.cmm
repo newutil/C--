@@ -1,0 +1,9 @@
+#include "wrap-syslibUtil.hmm"
+
+public int open(char[] path, int mode) {
+  char[] buf = _newAbsPath(path);
+  if (buf==null) return errno;
+  int r = _open(buf, mode);
+  free(buf);
+  return r;
+}

@@ -1,0 +1,19 @@
+#include "stdioUtil.hmm"
+
+// ファイルクローズ
+public boolean fclose(FILE fp) {
+  _chkFp(fp);                                    // 妥当な fp かチェックする
+  if (fp.slot<3) _exit(EUSTDIO);                // 標準 I/O はクローズ禁止
+  if (fp.mode!=O_RDONLY && fflush(fp))          // O_WRONLY, O_APPEND ならフラッシュ
+    return true;                                //  フラッシュエラーなら戻る
+
+  if (close(fp.fd)<0) {                         // ファイルをクローズする
+    fp.eof = fp.err = true;                     //  クローズできなかった
+    return true;                                //   エラーで戻る
+  }
+
+  if (fp.buf!=null) free(fp.buf);               // バッファを解放して
+  _allFiles[fp.slot]=null;                       // スロットを解放して
+  free(fp);                                     // 構造体を解放する
+  return false;
+}

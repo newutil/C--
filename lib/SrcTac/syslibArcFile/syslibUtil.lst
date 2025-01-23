@@ -1,0 +1,73 @@
+*** 定数 ***
+
+*** BSSセグメント ***
+
+*** ヘッダ ***
+magic = 0107
+text  = 003c
+data  = 0002
+bss   = 0000
+syms  = 001c
+entry = 0000
+trsize= 0010
+drsize= 0000
+
+*** TEXTセグメント ***
+0000          	_l1
+0000 c030     	        push    g3              ; G3 はレジスタ変数なので破壊してはいけない
+0002 091d 0004	        ld      g1,4,sp         ; G1 に第1パラメータを格納
+0006 0d20     	        ld      g2,#0           ; G2 に 0 を格納
+0008 0d30     	        ld      g3,#0           ; G3 に 0 を格納
+000a a0f0 002c	        jmp     .cmn            ; 共通処理にジャンプ
+000e          	_l2
+000e c030     	        push    g3              ; G3 はレジスタ変数なので破壊してはいけない
+0010 091d 0004	        ld      g1,4,sp         ; G1 に第1パラメータを格納
+0014 092d 0006	        ld      g2,6,sp         ; G2 に第2パラメータを格納
+0018 0d30     	        ld      g3,#0           ; G3 に 0 を格納
+001a a0f0 002c	        jmp     .cmn            ; 共通処理にジャンプ
+001e          	_l3
+001e c030     	        push    g3              ; G3 はレジスタ変数なので破壊してはいけない
+0020 091d 0004	        ld      g1,4,sp         ; G1 に第1パラメータを格納
+0024 092d 0006	        ld      g2,6,sp         ; G2 に第2パラメータを格納
+0028 093d 0008	        ld      g3,8,sp         ; G3 に第3パラメータを格納
+002c          	.cmn
+002c f000     	        svc                     ; SVC 割り込みを発生させる
+002e 2d00     	        cmp     g0,#0           ; システムコールの返り値が
+0030 a0a0 0038	        jnm     .restr          ; 0以上なら errno を操作しない
+0034 1000 003c	        st      g0,_errno       ; errno にシステムコールのエラー番号を格納
+0038 c430     	.restr  pop     g3              ; G3 を復元
+003a d000     	        ret
+
+*** DATAセグメント ***
+003c 0000     	_errno  dw      0           ; エラー番号
+
+*** 再配置表 ***
+TR領域
+Addr	Name	Type	No.
+000c	.cmn	TEXT	  3
+001c	.cmn	TEXT	  3
+0032	.restr	TEXT	  6
+0036	_errno	DATA	  1
+
+DR領域
+Addr	Name	Type	No.
+
+*** 名前表 ***
+No.	Name	Type	Value	Offset
+0	@syslibUtil.s	TEXT	0000	0000
+1	_errno	DATA	0000	000e
+2	_l1	TEXT	0000	0015
+3	.cmn	TEXT	002c	0019
+4	_l2	TEXT	000e	001e
+5	_l3	TEXT	001e	0022
+6	.restr	TEXT	0038	0026
+
+*** 文字列表 ***
+Offset	String
+0000	@syslibUtil.s
+000e	_errno
+0015	_l1
+0019	.cmn
+001e	_l2
+0022	_l3
+0026	.restr

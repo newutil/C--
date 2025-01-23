@@ -1,0 +1,4 @@
+// アルファベット大文字か？
+public boolean isUpper(char c) {
+  return ord('A')<=ord(c) && ord(c)<=ord('Z');
+}

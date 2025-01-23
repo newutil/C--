@@ -1,0 +1,7 @@
+#include "stdlibUtil.hmm"
+
+
+public void srand(int seed) {
+  if (seed==0) seed=1;
+  _lfsr = seed;
+}

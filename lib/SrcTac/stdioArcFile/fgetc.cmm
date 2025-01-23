@@ -1,0 +1,14 @@
+#include "stdioUtil.hmm"
+
+// ファイル（ストリーム）から1文字読み込む
+public char fgetc(FILE fp) {
+  _chkFp(fp);                                   // 妥当な fp かチェックする
+  if (fp.mode!=O_RDONLY) _exit(EUMODE);         // O_RDONLY以外にfgetcできない
+  if (fp.cnt>=fp.len) _fillBuf(fp);             // バッファが空なら満たす
+  if (fp.eof) _exit(EUEOF);                     // ユーザがEOFチェックをすべき
+
+  char c = fp.buf[fp.cnt];                      // バッファから１文字取り出す
+  fp.cnt = fp.cnt + 1;
+
+  return c;
+}

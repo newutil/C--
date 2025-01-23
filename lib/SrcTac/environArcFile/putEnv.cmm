@@ -1,0 +1,8 @@
+#include "environUtil.hmm"
+
+// 環境変数を "名前=値" 形式の文字列を用いて設定
+public boolean putEnv(char[] string) {
+  int nameLen = strChr(string, '=');                        // '=' を探索する
+  char[] value = _addrAdd(string, nameLen+1);               // 値のアドレス計算
+  return _setNEnv(string, nameLen, value, true);             // _setNEnv で処理
+}

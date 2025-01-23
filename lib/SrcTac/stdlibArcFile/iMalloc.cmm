@@ -1,0 +1,5 @@
+#include <stdlib.hmm>
+
+public int[] iMalloc(int n) {                   // int配列用の malloc
+  return malloc(sizeof(int)*n);
+}

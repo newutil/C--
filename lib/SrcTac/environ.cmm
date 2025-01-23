@@ -40,7 +40,7 @@
 public char[][] environ;
 
 // environ 確保済みの配列サイズ
-int capacity;
+int _capacity;
 
 // 環境変数の初期化
 public void _environInit(char[][] envp) {
@@ -48,8 +48,8 @@ public void _environInit(char[][] envp) {
   while (envp[envs] != null) {
     envs = envs + 1;                                        // 要素数を得る
   }
-  capacity = envs + 1;                                      // 要素数 + null
-  environ = rMalloc(capacity);
+  _capacity = envs + 1;                                      // 要素数 + null
+  environ = rMalloc(_capacity);
   for (int i = 0; i < envs; i = i + 1) {                    // 要素をコピー
     int len = strLen(envp[i]);
     environ[i] = cMalloc(len + 1);
@@ -59,8 +59,8 @@ public void _environInit(char[][] envp) {
 }
 
 // environ 中のインデックスを返す。存在しなければ環境変数の個数を返す
-// 存在しなければ、 environ[envIndex(name, len)] == null になる
-int envIndex(char[] name, int len) {
+// 存在しなければ、 environ[_envIndex(name, len)] == null になる
+int _envIndex(char[] name, int len) {
   int i = 0;
   for (; environ[i] != null; i = i + 1) {
     int nameLen = strChr(environ[i], '=');
@@ -73,7 +73,7 @@ int envIndex(char[] name, int len) {
 
 // 環境変数の値を返す。存在しなければ null を返す。
 public char[] getEnv(char[] name) {
-  int index = envIndex(name, strLen(name));                 // 名前で探索する
+  int index = _envIndex(name, strLen(name));                 // 名前で探索する
   if (environ[index] == null) {                             // 存在しなければ
     return null;                                            //   null を返す
   }
@@ -90,7 +90,7 @@ void reallocEnv(int newCap) {
   newEnv[envs] = null;                                      // null 終端
   free(environ);                                            // 古い配列を解放
   environ = newEnv;                                         // 配列と
-  capacity = newCap;                                        //  配列サイズを
+  _capacity = newCap;                                        //  配列サイズを
 }                                                           //   更新する
 
 // 環境変数を表現する文字列（"名前=値"）を作る
@@ -103,15 +103,15 @@ char[] makeEnvStr(char[] name, int nameLen, char[] value) {
 }
 
 // 環境変数を追加・上書きする基本ルーチン
-boolean setNEnv(char[] name, int nameLen, char[] value, boolean overwrite) {
+boolean _setNEnv(char[] name, int nameLen, char[] value, boolean overwrite) {
   if (name==null || nameLen<=0) {                           // name が変なら
     errno = EINVAL;                                         //  errnoを変更して
     return true;                                            //   エラー終了
   }
-  int index = envIndex(name, nameLen);                      // 環境変数を探索
+  int index = _envIndex(name, nameLen);                      // 環境変数を探索
   if (environ[index] == null) {                             // 同名のものは無い
     int size = index + 2;                                   //   追加処理開始
-    if (size > capacity) {                                  //   配列容量が不足
+    if (size > _capacity) {                                  //   配列容量が不足
       reallocEnv(size);                                     //    配列を再割付
     }
     environ[index+1] = null;                                // null 終端
@@ -126,7 +126,7 @@ boolean setNEnv(char[] name, int nameLen, char[] value, boolean overwrite) {
 public boolean putEnv(char[] string) {
   int nameLen = strChr(string, '=');                        // '=' を探索する
   char[] value = _addrAdd(string, nameLen+1);               // 値のアドレス計算
-  return setNEnv(string, nameLen, value, true);             // setNEnv で処理
+  return _setNEnv(string, nameLen, value, true);             // _setNEnv で処理
 }
 
 // 環境変数を２つの文字列 "名前" ， "値" を用いて設定
@@ -136,12 +136,12 @@ public boolean setEnv(char[] name, char[] value, boolean overwrite) {
     errno = EINVAL;                                         //  errnoを変更して
     return true;                                            //   エラー終了
   }
-  return setNEnv(name, strLen(name), value, overwrite);     // 追加・上書きする
+  return _setNEnv(name, strLen(name), value, overwrite);     // 追加・上書きする
 }
 
 // 環境変数を削除（存在しなければ何もしない）
 public boolean unsetEnv(char[] name) {
-  int index = envIndex(name, strLen(name));                 // 環境変数を探索
+  int index = _envIndex(name, strLen(name));                 // 環境変数を探索
   if (environ[index] == null) {                             // 存在しないなら
     return false;                                           //  正常終了
   }
@@ -201,7 +201,7 @@ void delDotDotDir(char[] path) {
 }
 
 // 絶対パスを取得する。
-Stat sta = {0,0,0,0};
+Stat _sta = {0,0,0,0};
 public boolean absPath(char[] path, char[] buf, int bufSiz) {
   if (path[0] == '/') {                                     // 1文字目が '/'
     strCpy(buf, "/");                                       //   "/"から始める
@@ -225,8 +225,8 @@ public boolean absPath(char[] path, char[] buf, int bufSiz) {
   if (l>0) {                                                // "/"があったなら
     char c = buf[l];                                        //   "/"の次で
     buf[l]='\0';                                            //    パスを切る
-    if (_stat(buf, sta)<0) return true;                     //    有効なpathか?
-    if ((sta.attr&0x10)==0) {                               //    DIRか?
+    if (_stat(buf, _sta)<0) return true;                     //    有効なpathか?
+    if ((_sta.attr&0x10)==0) {                               //    DIRか?
       errno = ENOENT;                                       //      DIRではない
       return true;                                          //
     }
@@ -249,7 +249,7 @@ public boolean chDir(char[] path) {
   char[] buf = cMalloc(BUF);
   if (absPath(path, buf, BUF)) {                    // 絶対パスに変換
     err = true;                                     //   absPath がエラー
-  } else if ((sta.attr&0x10)==0) {                  // ディレクトリではない
+  } else if ((_sta.attr&0x10)==0) {                  // ディレクトリではない
     errno = EPATH;
     err = true;
   } else if (setEnv("PWD", buf, true)) {            // 環境変数 PWD を変更

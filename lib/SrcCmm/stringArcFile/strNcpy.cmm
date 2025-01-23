@@ -1,0 +1,10 @@
+
+// 文字数制限付きの文字列コピー(n文字未満コピー）
+public char[] strNcpy(char[] d, char[] s, int n) {
+  int i=0;
+  for (; i<n-1 && s[i]!='\0'; i=i+1)
+    d[i]=s[i];
+  for (;i<n; i=i+1)
+    d[i]='\0';
+  return d;
+}

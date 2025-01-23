@@ -1,0 +1,9 @@
+#include "stdioUtil.hmm"
+
+// EOFチェック
+public boolean feof(FILE fp) {
+  _chkFp(fp);                                   // 妥当な fp かチェックする
+  if (fp.mode!=O_RDONLY) _exit(EUMODE);         // O_RDONLY以外にfgetcできない
+  if (fp.cnt>=fp.len) _fillBuf(fp);             // バッファが空なら満たす
+  return fp.eof;
+}

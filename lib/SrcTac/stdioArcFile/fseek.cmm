@@ -1,0 +1,13 @@
+#include "stdioUtil.hmm"
+
+// 読み込み位置を移動する
+public boolean fseek(FILE fp, int offsh, int offsl){
+  _chkFp(fp);                                   // 妥当な fp かチェックする
+  if (fp.mode!=O_RDONLY) fflush(fp);            // 出力ならバッファを空にする
+
+  int r=seek(fp.fd, offsh, offsl);              // seek する
+  if (r!=0) _exit(r);                           // seek エラーなら終了
+
+  if (fp.mode==O_RDONLY) _fillBuf(fp);          // 入力ならバッファを満たす
+  return false;                                 // 今のところいつも正常終了
+}

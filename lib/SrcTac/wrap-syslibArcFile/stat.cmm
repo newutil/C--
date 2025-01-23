@@ -1,0 +1,9 @@
+#include "wrap-syslibUtil.hmm"
+
+public int stat(char[] path, Stat stat) {
+  char[] buf = _newAbsPath(path);
+  if (buf==null) return errno;
+  int r = _stat(buf, stat);
+  free(buf);
+  return r;
+}

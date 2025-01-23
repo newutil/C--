@@ -1,0 +1,43 @@
+#include "environUtil.hmm"
+
+// environ 参照配列を再割付する
+void reallocEnv(int newCap) {
+  char[][] newEnv = rMalloc(newCap);                        // 新しい配列を確保
+  int envs = 0;
+  for (; environ[envs] != null; envs = envs + 1) {          // 全環境変数を
+    newEnv[envs] = environ[envs];                           //   新配列にコピー
+  }
+  newEnv[envs] = null;                                      // null 終端
+  free(environ);                                            // 古い配列を解放
+  environ = newEnv;                                         // 配列と
+  _capacity = newCap;                                        //  配列サイズを
+}                                                           //   更新する
+
+// 環境変数を表現する文字列（"名前=値"）を作る
+char[] makeEnvStr(char[] name, int nameLen, char[] value) {
+  char[] string = cMalloc(nameLen+1+strLen(value)+1);       // メモリ確保
+  strNcpy(string, name, nameLen+1);                         // 「名前」をコピー
+  strCat(string, "=");                                      // "="を追加
+  strCat(string, value);                                    // 「値」をコピー
+  return string;
+}
+
+// 環境変数を追加・上書きする基本ルーチン
+public boolean _setNEnv(char[] name, int nameLen, char[] value, boolean overwrite) {
+  if (name==null || nameLen<=0) {                           // name が変なら
+    errno = EINVAL;                                         //  errnoを変更して
+    return true;                                            //   エラー終了
+  }
+  int index = _envIndex(name, nameLen);                      // 環境変数を探索
+  if (environ[index] == null) {                             // 同名のものは無い
+    int size = index + 2;                                   //   追加処理開始
+    if (size > _capacity) {                                  //   配列容量が不足
+      reallocEnv(size);                                     //    配列を再割付
+    }
+    environ[index+1] = null;                                // null 終端
+  } else {                                                  // 同名のものがある
+    free(environ[index]);                                   //   古いものを解放
+  }
+  environ[index] = makeEnvStr(name, nameLen, value);        // "名前=値"を記録
+  return false;                                             // 正常終了
+}

@@ -1,0 +1,10 @@
+#include <syslib.hmm>
+
+Stat statmp = {0, 0, 0, 0};                     // stat の結果を格納する
+public boolean fsize(char[] path, int[] size) {
+  int e = stat(path, statmp);                   // stat システムコール
+  if (e<0) _exit(e);                            // stat エラーなら終了
+  size[0] = statmp.lenH;
+  size[1] = statmp.lenL;
+  return false;
+}

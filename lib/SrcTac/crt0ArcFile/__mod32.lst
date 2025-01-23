@@ -1,0 +1,68 @@
+*** 定数 ***
+
+*** BSSセグメント ***
+
+*** ヘッダ ***
+magic = 0107
+text  = 003c
+data  = 0000
+bss   = 0000
+syms  = 0018
+entry = 0000
+trsize= 0010
+drsize= 0000
+
+*** TEXTセグメント ***
+0000          	__mod32                     ; int _mod32(int[] dst, int src)
+0000 c030     	        push    g3
+0002 090d 0004	        ld      g0,4,sp     ; ディスティネーション(アドレス)
+0006 0e10     	        ld      g1,0,g0     ; ディスティネーション上位ワード
+0008 0920 0002	        ld      g2,2,g0     ; ディスティネーション下位ワード
+000c 0a00 0011	        ld      g0,#17      ; (g1,g2)は被除数, g0はカウンタ
+0010 0d30     	        ld      g3,#0       ; g3は商
+0012 291d 0006	.M1     cmp     g1,6,sp     ; 被除数から除数が引けるなら引く
+0016 a010 0020	        jc      .M2         ;
+001a 211d 0006	        sub     g1,6,sp     ;
+001e 1d31     	        add     g3,#1       ; 引いた時は商の最下位ビットを1にする
+0020 2501     	.M2     sub     g0,#1       ; 17回繰り返したなら
+0022 a000 0036	        jz      .M4         ;  終了
+0026 8d11     	        shll    g1,#1       ; 被除数を左にシフト
+0028 8d21     	        shll    g2,#1       ;
+002a a090 0030	        jnc     .M3         ;
+002e 1d11     	        add     g1,#1       ;
+0030 8d31     	.M3     shll    g3,#1       ; 商を左にシフト
+0032 a0f0 0012	        jmp     .M1
+0036 0c01     	.M4     ld      g0,g1       ; 余りを返す
+0038 c430     	        pop     g3
+003a d000     	        ret
+
+*** DATAセグメント ***
+
+*** 再配置表 ***
+TR領域
+Addr	Name	Type	No.
+0018	.M2	TEXT	  3
+0024	.M4	TEXT	  4
+002c	.M3	TEXT	  5
+0034	.M1	TEXT	  2
+
+DR領域
+Addr	Name	Type	No.
+
+*** 名前表 ***
+No.	Name	Type	Value	Offset
+0	@__mod32.s	TEXT	0000	0000
+1	__mod32	TEXT	0000	000b
+2	.M1	TEXT	0012	0013
+3	.M2	TEXT	0020	0017
+4	.M4	TEXT	0036	001b
+5	.M3	TEXT	0030	001f
+
+*** 文字列表 ***
+Offset	String
+0000	@__mod32.s
+000b	__mod32
+0013	.M1
+0017	.M2
+001b	.M4
+001f	.M3

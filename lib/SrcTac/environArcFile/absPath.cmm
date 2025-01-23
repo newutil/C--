@@ -1,0 +1,86 @@
+#include "environUtil.hmm"
+
+// 意味のない "." を削除する
+void delDotDir(char[] path) {
+  int l = 0;
+  for (int h=0; path[h]!='\0'; h=h+1) {
+    path[l] = path[h];
+    l = l + 1;
+    if (path[h]=='/' && path[h+1]=='.' &&
+        (path[h+2]=='/' || path[h+2]=='\0')) {              // "/." なら
+        h = h + 1;                                          //   "." をスキップ
+    }
+  }
+  path[l] = '\0';
+}
+
+// 連続する "/" を一つだけにする
+void oneSlash(char[] path) {
+  int l = 0;
+  for (int h=0; path[h]!='\0'; h=h+1) {
+    for (; path[h]=='/' && path[h+1]=='/'; h=h+1)           // "/" が連続なら
+        ;                                                   //     スキップする
+    path[l] = path[h];
+    l = l + 1;
+  }
+  if (l>1 && path[l-1]=='/') l = l - 1;                     // 行末の / を消す
+  path[l] = '\0';
+}
+
+// ".." があったら前のディレクトリを消す
+void delDotDotDir(char[] path) {
+  int l = 0;
+  for (int h=0; path[h]!='\0'; h=h+1) {
+    if (path[h]=='/' && path[h+1]=='.' && path[h+2]=='.'    // "/.." なら
+        && (path[h+3]=='/' || path[h+3]=='\0')) {
+      h = h + 2;                                            //   ".." をスキップ
+      if (l>0) {
+        for (l=l-1; l>0 && path[l]!='/'; l=l-1)             //   前の"/"まで削除
+          ;
+      }
+    } else if (path[h]=='/' && path[h+1]=='\0') {          // 行末の "/" は
+      break;                                               //   コピーしない
+    } else {
+      path[l] = path[h];
+      l = l + 1;
+    }
+  }
+  path[l] = '\0';
+}
+
+// 絶対パスを取得する。
+
+public boolean absPath(char[] path, char[] buf, int bufSiz) {
+  if (path[0] == '/') {                                     // 1文字目が '/'
+    strCpy(buf, "/");                                       //   "/"から始める
+  } else {                                                  // それ以外
+    char[] pwd = getWd();                                   //   PWDを取得
+    if (strLen(pwd) >= bufSiz-2) {                          //   PWDが長すぎる
+      errno = EINVAL;                                       //  errnoを変更して
+      return true;
+    }
+    strCpy(buf, pwd);                                       //   pwd から開始
+    strCat(buf, "/");                                       //   念のため/追加
+  }
+  if (strLen(buf)+strLen(path) >= bufSiz-1) {               // 十分なbufがない
+    errno = EINVAL;                                         //  errnoを変更して
+    return true;
+  }
+  strCat(buf, path);                                        // bufに結合する
+  delDotDir(buf);                                           // "."を削除する
+  oneSlash(buf);                                            // 連続の"/"を削除
+  int l = strRchr(buf, '/') + 1;                            // 最後の"/"を探す
+  if (l>0) {                                                // "/"があったなら
+    char c = buf[l];                                        //   "/"の次で
+    buf[l]='\0';                                            //    パスを切る
+    if (_stat(buf, _sta)<0) return true;                     //    有効なpathか?
+    if ((_sta.attr&0x10)==0) {                               //    DIRか?
+      errno = ENOENT;                                       //      DIRではない
+      return true;                                          //
+    }
+    buf[l]=c;                                               //    パスを復元
+  }
+  delDotDotDir(buf);                                        // ".."を処理
+  if (buf[0]=='\0') strCpy(buf, "/");                       // 処理結果が""なら
+  return false;
+}

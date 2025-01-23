@@ -1,0 +1,8 @@
+#include "stdlibUtil.hmm"
+
+
+// 擬似乱数（ガロアLFSR）
+public int rand() {
+  _lfsr = ((_lfsr >> 1) & 0x7fff) ^ (-(_lfsr & 1) & 0xb400); 
+  return _lfsr;
+}

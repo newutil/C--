@@ -1,0 +1,21 @@
+#include "stdioUtil.hmm"
+
+// バッファをフラッシュする
+public boolean fflush(FILE fp) {
+  _chkFp(fp);                                   // 妥当な fp かチェックする
+  if (fp.mode==O_RDONLY) _exit(EUMODE);         // O_RDONLY はフラッシュできない
+                                                // (再帰にならないように_exit)
+  if (fp.err) return true;                      // 既にエラーになっている
+  if (fp.buf==null) return false;               // フラッシュすべきものがない
+  if (fp.cnt==0) return false;                  // フラッシュすべきものがない
+
+  if (fp.tty) {                                 // コンソールの場合
+    ttyWrite(fp.buf, fp.cnt);                   //  コンソールに送信
+    fp.cnt=0;                                   //  バッファは空
+  } else {                                      // ファイルの場合
+    int l = write(fp.fd, fp.buf, fp.cnt);       //  バッファを出力する
+    if (l>0) fp.cnt = fp.cnt - l;               //  出力しただけ cnt を減らす
+  }
+
+  return fp.eof = fp.err = fp.cnt!=0;           // バッファが空になっていない
+}                                               //  ならエラー

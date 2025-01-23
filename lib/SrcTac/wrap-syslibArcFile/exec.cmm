@@ -1,0 +1,9 @@
+#include "wrap-syslibUtil.hmm"
+
+public int exec(char[] name, void[] argv, void[] envp) {
+  char[] buf = _newAbsPath(name);
+  if (buf==null) return errno;
+  int r = _exec(buf, argv, envp);
+  free(buf);
+  return r;
+}

@@ -1,0 +1,25 @@
+#ifndef STDIOUTIL_H
+#define STDIOUTIL_H
+
+#include <stdio.hmm>
+#include <stdlib.hmm>
+#include <string.hmm>
+#include <syslib.hmm>
+#include <errno.hmm>
+
+
+public FILE[] _allFiles;
+public FILE stdin;
+public FILE stdout;
+public FILE stderr;
+
+// 標準 I/O
+#define FMAX 5                     // TacOS で１ユーザプロセスの最大ファイル数
+#define TSIZ 80                    // コンソールI/Oのバッファサイズ
+#define DSIZ 128                   // ディスクI/Oのバッファサイズ
+
+public void _stdioInit();
+public void _chkFp(FILE fp);        // public化
+public void _fillBuf(FILE fp);
+
+#endif

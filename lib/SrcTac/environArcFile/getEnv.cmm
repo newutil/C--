@@ -1,0 +1,10 @@
+#include "environUtil.hmm"
+
+// 環境変数の値を返す。存在しなければ null を返す。
+public char[] getEnv(char[] name) {
+  int index = _envIndex(name, strLen(name));                 // 名前で探索する
+  if (environ[index] == null) {                             // 存在しなければ
+    return null;                                            //   null を返す
+  }
+  return _addrAdd(environ[index], strLen(name) + 1);        // 値部分を返す
+}

@@ -1,0 +1,15 @@
+#include <ctype.hmm>
+
+// 16進文字列から整数に
+public int htoi(char[] s) {
+  int v = 0;
+  for (int i=0; isXdigit(s[i]); i=i+1) {
+    char c = s[i];
+    if (isDigit(c)) {                            // 0-9
+      v = v * 16 + (ord(c)-ord('0'));
+    } else {                                     // a-f または A-F
+      v = v * 16 + (10+ord(toUpper(c))-ord('A'));
+    }
+  }
+  return v;
+}

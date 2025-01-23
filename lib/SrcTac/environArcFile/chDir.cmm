@@ -1,0 +1,17 @@
+#include "environUtil.hmm"
+
+#define BUF 80
+public boolean chDir(char[] path) {
+  boolean err = false;
+  char[] buf = cMalloc(BUF);
+  if (absPath(path, buf, BUF)) {                    // 絶対パスに変換
+    err = true;                                     //   absPath がエラー
+  } else if ((_sta.attr&0x10)==0) {                  // ディレクトリではない
+    errno = EPATH;
+    err = true;
+  } else if (setEnv("PWD", buf, true)) {            // 環境変数 PWD を変更
+    err = true;                                     //   setEnv がエラー
+  }
+  free(buf);
+  return err;
+}

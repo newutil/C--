@@ -52,7 +52,7 @@
 #define TSIZ 80                    // コンソールI/Oのバッファサイズ
 #define DSIZ 128                   // ディスクI/Oのバッファサイズ
 
-FILE[] allFiles = array(3+FMAX);   // オープンファイルの一覧(stdin,out,err含む)
+public FILE[] _allFiles = array(3+FMAX);   // オープンファイルの一覧(stdin,out,err含む)
 
 // stdin 用のFILE構造体とバッファ
 char[] stdinBuf = array(TSIZ);
@@ -68,23 +68,23 @@ public FILE stderr = {-3, O_WRONLY, null, 0, 0, 0, true, false, false, 2};
 // stdio の初期化ルーチン
 public void _stdioInit() {
   stdin.buf = stdinBuf;
-  allFiles[0] = stdin;
+  _allFiles[0] = stdin;
   stdout.buf = stdoutBuf;
-  allFiles[1] = stdout;
-  allFiles[2] = stderr;                         // stderr はバッファリングしない
+  _allFiles[1] = stdout;
+  _allFiles[2] = stderr;                         // stderr はバッファリングしない
 }
 
 // 妥当な fp か判定する
-void chkFp(FILE fp) {
+void _chkFp(FILE fp) {
   if (fp==null || fp.slot<0 || 3+FMAX<=fp.slot
-      || allFiles[fp.slot]!=fp)                 // 怪しい fp なら
+      || _allFiles[fp.slot]!=fp)                 // 怪しい fp なら
     _exit(EUBADF);                              // エラー終了する
 }                                               // (再帰にならないように_exit)
 
 // --------------------------- ファイルの write -------------------------------
 // バッファをフラッシュする
 public boolean fflush(FILE fp) {
-  chkFp(fp);                                    // 妥当な fp かチェックする
+  _chkFp(fp);                                    // 妥当な fp かチェックする
   if (fp.mode==O_RDONLY) _exit(EUMODE);         // O_RDONLY はフラッシュできない
                                                 // (再帰にならないように_exit)
   if (fp.err) return true;                      // 既にエラーになっている
@@ -105,7 +105,7 @@ public boolean fflush(FILE fp) {
 // exit が使用する
 public void _flushAll() {
   for (int i=0; i<3+FMAX; i=i+1) {
-    FILE fp = allFiles[i];
+    FILE fp = _allFiles[i];
     if (fp!=null && fp.mode!=O_RDONLY) fflush(fp);
   }
 }
@@ -113,7 +113,7 @@ public void _flushAll() {
 // ファイル（ストリーム）に1文字書き込む
 char[] fputcBuf = array(1);                     // バッファリングしない場合使う
 public boolean fputc(char c, FILE fp) {
-  chkFp(fp);                                    // 妥当な fp かチェックする
+  _chkFp(fp);                                    // 妥当な fp かチェックする
   if (fp.mode==O_RDONLY) _exit(EUMODE);         // O_RDONLYモードにfputcできない
   if (fp.err) return true;                      // すでにエラーになっている
   if (fp.buf==null) {                           // バッファがない
@@ -145,7 +145,7 @@ public boolean puts(char[] str) {
 
 // --------------------------- ファイルの read -------------------------------
 // 読み込みバッファにデータを読む
-void fillBuf(FILE fp) {
+public void _fillBuf(FILE fp) {
   if (fp.tty) {                                 // コンソールの場合は
     int l = ttyRead(fp.buf, fp.size);
     fp.len = l;
@@ -166,17 +166,17 @@ void fillBuf(FILE fp) {
 
 // EOFチェック
 public boolean feof(FILE fp) {
-  chkFp(fp);                                    // 妥当な fp かチェックする
+  _chkFp(fp);                                    // 妥当な fp かチェックする
   if (fp.mode!=O_RDONLY) _exit(EUMODE);         // O_RDONLY以外にfgetcできない
-  if (fp.cnt>=fp.len) fillBuf(fp);              // バッファが空なら満たす
+  if (fp.cnt>=fp.len) _fillBuf(fp);              // バッファが空なら満たす
   return fp.eof;
 }
 
 // ファイル（ストリーム）から1文字読み込む
 public char fgetc(FILE fp) {
-  chkFp(fp);                                    // 妥当な fp かチェックする
+  _chkFp(fp);                                    // 妥当な fp かチェックする
   if (fp.mode!=O_RDONLY) _exit(EUMODE);         // O_RDONLY以外にfgetcできない
-  if (fp.cnt>=fp.len) fillBuf(fp);              // バッファが空なら満たす
+  if (fp.cnt>=fp.len) _fillBuf(fp);              // バッファが空なら満たす
   if (fp.eof) _exit(EUEOF);                     // ユーザがEOFチェックをすべき
 
   char c = fp.buf[fp.cnt];                      // バッファから１文字取り出す
@@ -206,13 +206,13 @@ public char[] fgets(char[] str, int n, FILE fp) {
 
 // 読み込み位置を移動する
 public boolean fseek(FILE fp, int offsh, int offsl){
-  chkFp(fp);                                    // 妥当な fp かチェックする
+  _chkFp(fp);                                    // 妥当な fp かチェックする
   if (fp.mode!=O_RDONLY) fflush(fp);            // 出力ならバッファを空にする
 
   int r=seek(fp.fd, offsh, offsl);              // seek する
   if (r!=0) _exit(r);                           // seek エラーなら終了
 
-  if (fp.mode==O_RDONLY) fillBuf(fp);           // 入力ならバッファを満たす
+  if (fp.mode==O_RDONLY) _fillBuf(fp);           // 入力ならバッファを満たす
   return false;                                 // 今のところいつも正常終了
 }
 
@@ -254,11 +254,11 @@ public boolean fsize(char[] path, int[] size) {
 }
 
 // ------------------------- ファイルの open/close ----------------------------
-// allFiles に空きスロットを捜す
+// _allFiles に空きスロットを捜す
 int srchSlot() {
   int n=-1;
   for (int i=0; i<3+FMAX; i=i+1) {
-    if (allFiles[i]==null) {
+    if (_allFiles[i]==null) {
       n = i;
       break;
     }
@@ -275,7 +275,7 @@ FILE allocFile(int fd, int mode, int siz) {
   fp.mode = mode;
   fp.buf = cMalloc(siz);                        // バッファを割当てる
   fp.size = siz;
-  allFiles[slot] = fp;                          // スロットに登録
+  _allFiles[slot] = fp;                          // スロットに登録
   fp.slot = slot;                               // スロットを記録
   return fp;
 }
@@ -314,7 +314,7 @@ public FILE fopen(char[] name, char[] mode) {
 
 // ファイルクローズ
 public boolean fclose(FILE fp) {
-  chkFp(fp);                                    // 妥当な fp かチェックする
+  _chkFp(fp);                                    // 妥当な fp かチェックする
   if (fp.slot<3) _exit(EUSTDIO);                // 標準 I/O はクローズ禁止
   if (fp.mode!=O_RDONLY && fflush(fp))          // O_WRONLY, O_APPEND ならフラッシュ
     return true;                                //  フラッシュエラーなら戻る
@@ -325,14 +325,14 @@ public boolean fclose(FILE fp) {
   }
 
   if (fp.buf!=null) free(fp.buf);               // バッファを解放して
-  allFiles[fp.slot]=null;                       // スロットを解放して
+  _allFiles[fp.slot]=null;                       // スロットを解放して
   free(fp);                                     // 構造体を解放する
   return false;
 }
 
 // エラーチェック
 public boolean ferror(FILE fp) {
-  chkFp(fp);                                    // 妥当な fp かチェックする
+  _chkFp(fp);                                    // 妥当な fp かチェックする
   return fp.err;
 }
 

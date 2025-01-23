@@ -1,0 +1,9 @@
+#include <stdlib.hmm>
+
+// ゼロでクリアされた配列を割りあてる
+public void[] calloc(int n, int s) {
+  char[] mem = malloc(n*s);                     // 割当てる。
+  for (int i=0; i<n*s; i=i+1)                   // 領域全体を
+    mem[i] = '\0';                              //   ゼロでクリアする
+  return mem;                                   // 領域を返す
+}

@@ -1,0 +1,5 @@
+#include <stdio.hmm>
+
+public boolean puts(char[] str) {
+  return fputs(str, stdout);
+}

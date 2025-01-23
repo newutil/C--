@@ -1,0 +1,5 @@
+#include <stdlib.hmm>
+
+public boolean[] bMalloc(int n) {               // boolean配列用の malloc
+  return malloc(sizeof(boolean)*n);
+}

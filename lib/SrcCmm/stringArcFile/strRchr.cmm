@@ -1,0 +1,7 @@
+// 最後の文字を探す
+public int strRchr(char[] s, char c) {
+  int i, j=-1;
+  for (i=0; s[i]!='\0'; i=i+1)
+    if (s[i]==c) j=i;
+  return j;
+}

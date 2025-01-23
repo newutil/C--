@@ -1,0 +1,7 @@
+#include <stdlib.hmm>
+
+public char[] getWd() {
+  char[] pwd = getEnv("PWD");
+  if (pwd==null) pwd = "/";                         // PWD がない場合は "/"
+  return pwd;
+}

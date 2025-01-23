@@ -1,0 +1,4 @@
+// アルファベット小文字か？
+public boolean isLower(char c) {
+  return ord('a')<=ord(c) && ord(c)<=ord('z');
+}

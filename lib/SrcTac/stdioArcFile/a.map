@@ -1,0 +1,2 @@
+0000	TEXT	.start
+0000	TEXT	@crt0.s

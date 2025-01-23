@@ -1,0 +1,9 @@
+#include "wrap-syslibUtil.hmm"
+
+public int mkDir(char[] path) {
+  char[] buf = _newAbsPath(path);
+  if (buf==null) return errno;
+  int r = _mkDir(buf);
+  free(buf);
+  return r;
+}

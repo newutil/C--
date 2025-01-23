@@ -1,0 +1,26 @@
+#include "environUtil.hmm"
+#include <sys/fs.hmm>
+
+// 環境変数の配列（environ 配列の末尾には null が複数存在する場合がある）
+public char[][] environ;
+
+// environ 確保済みの配列サイズ
+public int _capacity;
+
+public Stat sta = {0,0,0,0};
+
+// 環境変数の初期化
+public void _environInit(char[][] envp) {
+  int envs = 0;
+  while (envp[envs] != null) {
+    envs = envs + 1;                                        // 要素数を得る
+  }
+  _capacity = envs + 1;                                      // 要素数 + null
+  environ = rMalloc(_capacity);
+  for (int i = 0; i < envs; i = i + 1) {                    // 要素をコピー
+    int len = strLen(envp[i]);
+    environ[i] = cMalloc(len + 1);
+    strCpy(environ[i], envp[i]);
+  }
+  environ[envs] = null;                                     // null 終端
+}

@@ -1,0 +1,8 @@
+#include <syslib.hmm>
+#include <stdio.hmm>
+
+// プロセスを終了
+public void exit(int status) {
+  _flushAll();
+  _exit(status);
+}

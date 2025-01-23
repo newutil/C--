@@ -1,0 +1,9 @@
+// 文字列結合
+public char[] strCat(char[] d, char[] s) {
+  int i=0;
+  while (d[i]!='\0')
+    i=i+1;
+  for (int j=i; (d[i]=s[i-j])!='\0'; i=i+1)
+    ;
+  return d;
+}

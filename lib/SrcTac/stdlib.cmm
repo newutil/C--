@@ -36,7 +36,7 @@
 #include <ctype.hmm>
 
 #define MBSIZE sizeof(MemBlk)                   // MemBlk のバイト数
-#define MAGIC  (memPool)                        // 番兵のアドレスを使用する
+#define MAGIC  (_memPool)                        // 番兵のアドレスを使用する
 
 // 空き領域はリストにして管理される
 struct MemBlk {                                 // 空き領域管理用の構造体
@@ -46,7 +46,7 @@ struct MemBlk {                                 // 空き領域管理用の構�
 
 // -------------------------- メモリ初期化ルーチン ----------------------------
 // メモリ管理の初期化
-MemBlk memPool = {null, 0};                     // 空き領域リストのルート
+public MemBlk _memPool = {null, 0};             // 空き領域リストのルート
 public int _end();                              // プロセスの BBS 領域の最後
 
 // メモリの初期化
@@ -54,9 +54,9 @@ public int _end();                              // プロセスの BBS 領域の
 //   メモリの最終アドレス _sp();
 //   メモリの大きさ       _sp() - addrof(_end)
 public void _stdlibInit() {                     // プログラム起動前の初期化
-  memPool.next = _iToA(addrof(_end));           // 空き領域
-  memPool.next.size = _sp() - addrof(_end);     // 空きメモリサイズ
-  memPool.next.next = null;
+  _memPool.next = _iToA(addrof(_end));           // 空き領域
+  _memPool.next.size = _sp() - addrof(_end);     // 空きメモリサイズ
+  _memPool.next.next = null;
   _alcAddr = _iToA(addrof(_end));               // 割当アドレスの初期化
 }
 
@@ -65,7 +65,7 @@ public void _stdlibInit() {                     // プログラム起動前の�
 // メモリを割り付ける
 public void[] malloc(int siz) {                 // メモリ割り当て
   int s = (siz + MBSIZE + 1) & ~1;              // 制御データ分大きい偶数に
-  MemBlk p = memPool;                           // 直前の領域
+  MemBlk p = _memPool;                           // 直前の領域
   MemBlk m = p.next;                            // 対象となる領域
 
   while (_uCmp(m.size, s)<0) {                  // 領域が小さい間
@@ -113,7 +113,7 @@ public void[][] rMalloc(int n) {                // 参照配列用の malloc
 // メモリを解放する
 public void free(void[] mem) {                  // 領域解放
   MemBlk q = _addrAdd(mem, -MBSIZE);            // 解放する領域
-  MemBlk p = memPool;                           // 直前の空き領域
+  MemBlk p = _memPool;                           // 直前の空き領域
   MemBlk m = p.next;                            // 直後の空き領域
   if (q.next!=MAGIC) _exit(EUBADA);             // 領域マジックナンバー確認
 

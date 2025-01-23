@@ -1,0 +1,22 @@
+#include <stdio.hmm>
+#include <syslib.hmm>
+
+// 読み込みバッファにデータを読む
+public void _fillBuf(FILE fp) {
+  if (fp.tty) {                                 // コンソールの場合は
+    int l = ttyRead(fp.buf, fp.size);
+    fp.len = l;
+  } else {
+    int l = read(fp.fd, fp.buf, fp.size);
+    if (l<0) {
+      fp.err = fp.eof = true;
+      l = 0;
+    } else if (l==0) {
+      fp.eof = true;
+    } else {
+      fp.eof = false;
+    }
+    fp.len = l;
+  }
+  fp.cnt = 0;
+}

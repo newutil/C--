@@ -1,0 +1,6 @@
+// 文字列の長さ
+public int strLen(char[] s) {
+  int i=0;
+  while (s[i]!='\0') i=i+1;
+  return i;
+}

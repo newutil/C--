@@ -1,0 +1,15 @@
+#include <string.hmm>
+
+// 文字列を探す
+public int strStr(char[] s1, char[] s2) {
+  int l = strLen(s2);
+  int d = strLen(s1) - l;
+  for (int i=0; i<d; i=i+1) {
+    int j;
+    for (j=0; j<l; j=j+1) {
+      if (s1[i+j]!=s2[j]) break;
+    }
+    if (j==l) return i;
+  }
+  return -1;
+}

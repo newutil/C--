@@ -1,0 +1,14 @@
+#include "environUtil.hmm"
+
+// 環境変数を削除（存在しなければ何もしない）
+public boolean unsetEnv(char[] name) {
+  int index = _envIndex(name, strLen(name));                 // 環境変数を探索
+  if (environ[index] == null) {                             // 存在しないなら
+    return false;                                           //  正常終了
+  }
+  free(environ[index]);                                     // メモリを解放する
+  for (int i=index; environ[i]!=null; i=i+1) {              // より後ろの要素は
+    environ[i] = environ[i+1];                              //    前につめる
+  }
+  return false;
+}

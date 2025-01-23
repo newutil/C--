@@ -1,0 +1,9 @@
+#include "wrap-syslibUtil.hmm"
+
+public int remove(char[] path) {
+  char[] buf = _newAbsPath(path);
+  if (buf==null) return errno;
+  int r = _remove(buf);
+  free(buf);
+  return r;
+}

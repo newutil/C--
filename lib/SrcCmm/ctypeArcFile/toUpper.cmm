@@ -1,0 +1,7 @@
+#include <ctype.hmm>
+
+// アルファベット小文字なら大文字へ変換する
+public char toUpper(char c) {
+  if (isLower(c)) c = chr(ord(c) - 0x20);
+  return c;
+}

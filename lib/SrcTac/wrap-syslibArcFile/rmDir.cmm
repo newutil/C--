@@ -1,0 +1,9 @@
+#include "wrap-syslibUtil.hmm"
+
+public int rmDir(char[] path) {
+  char[] buf = _newAbsPath(path);
+  if (buf==null) return errno;
+  int r = _rmDir(buf);
+  free(buf);
+  return r;
+}

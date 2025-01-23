@@ -1,0 +1,26 @@
+#ifndef ENVIRONUTIL_H
+#define ENVIRONUTIL_H
+
+#include <crt0.hmm>
+#include <stdlib.hmm>
+#include <string.hmm>
+#include <syslib.hmm>
+#include <errno.hmm>
+
+
+// 環境変数の配列（environ 配列の末尾には null が複数存在する場合がある）
+public char[][] environ;
+
+// environ 確保済みの配列サイズ
+public int _capacity;
+
+public Stat _sta;
+
+public int _envIndex(char[] name, int len);
+
+public boolean _setNEnv(char[] name, int nameLen, char[] value, boolean overwrite);
+
+
+
+
+#endif

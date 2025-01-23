@@ -1,0 +1,61 @@
+#include "stdioUtil.hmm"
+
+
+
+// _allFiles に空きスロットを捜す
+int srchSlot() {
+  int n=-1;
+  for (int i=0; i<3+FMAX; i=i+1) {
+    if (_allFiles[i]==null) {
+      n = i;
+      break;
+    }
+  }
+  if (n<0) _exit(EUNFILE);                      // 空きスロットが見つからない
+  return n;
+}
+
+// FILE 構造体を割当てる
+FILE allocFile(int fd, int mode, int siz) {
+  int slot = srchSlot();                        // 空きスロットを探す
+  FILE fp = calloc(1, sizeof(FILE));            // calloc はメモリクリアもする
+  fp.fd =fd;
+  fp.mode = mode;
+  fp.buf = cMalloc(siz);                        // バッファを割当てる
+  fp.size = siz;
+  _allFiles[slot] = fp;                          // スロットに登録
+  fp.slot = slot;                               // スロットを記録
+  return fp;
+}
+
+// リードモードオープン
+FILE rdOpen(char[] name) {
+  int fd = open(name, O_RDONLY);                // O_RDONLYモードでファイルオープン
+  if (fd<0) return null;                        // 原因はopenがerrnoに記録済み
+  FILE fp = allocFile(fd, O_RDONLY, DSIZ);      // FILE 構造体を割当てる
+  return fp;
+}
+
+// アペンド/ライトモードオープン
+FILE awOpen(char[] name, int mode) {
+  int fd = open(name, mode);                    // ファイルオープン
+  if (fd<0) {                                   // ファイルが存在しないなら
+    if (errno==ENOENT && creat(name)>=0)        //  creat でファイルを作成する
+      fd = open(name, mode);                    //  もう一度オープンしてみる
+    if (fd<0) return null;                      // それでもだめならエラー
+  }
+  return allocFile(fd, mode, DSIZ);             // FILE 構造体を割当てる
+}
+
+// ファイルオープン
+public FILE fopen(char[] name, char[] mode) {
+  if (strCmp(mode, "r")==0)
+    return rdOpen(name);                        // リードオープン
+  else if (strCmp(mode, "w")==0)
+    return awOpen(name, O_WRONLY);              // ライトオープン
+  else if (strCmp(mode, "a")==0)
+    return awOpen(name, O_APPEND);              // アペンドオープン
+
+  _exit(EUMODE);                                // モードが不正
+  return null;
+}

@@ -1,0 +1,7 @@
+#include "stdioUtil.hmm"
+
+// エラーチェック
+public boolean ferror(FILE fp) {
+  _chkFp(fp);                                    // 妥当な fp かチェックする
+  return fp.err;
+}

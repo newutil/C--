@@ -1,0 +1,6 @@
+#include <ctype.hmm>
+
+// アルファベットか？
+public boolean isAlpha(char c) {
+  return isUpper(c) || isLower(c);
+}

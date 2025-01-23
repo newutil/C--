@@ -1,0 +1,6 @@
+#include <ctype.hmm>
+
+// 英数字か？
+public boolean isAlnum(char c) {
+  return isDigit(c) || isAlpha(c);
+}

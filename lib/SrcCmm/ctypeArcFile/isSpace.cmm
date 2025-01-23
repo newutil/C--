@@ -1,0 +1,5 @@
+// 空白文字か？
+public boolean isSpace(char c) {
+  return '\t'==c || '\n'==c || '\x0b'==c || // '\x0b'は VT
+         '\x0c'==c  || '\r'==c || ' '==c;   // '\x0c'は FF
+}

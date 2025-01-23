@@ -1,0 +1,22 @@
+#ifndef STDLIBUTIL_H
+#define STDLIBUTIL_H
+
+#include <crt0.hmm>
+#include <syslib.hmm>
+#include <errno.hmm>
+#include <stdlib.hmm>
+
+#define MBSIZE sizeof(MemBlk)                   // MemBlk のバイト数
+#define MAGIC  (_memPool)                        // 番兵のアドレスを使用する
+
+// 空き領域はリストにして管理される
+struct MemBlk {                                 // 空き領域管理用の構造体
+  MemBlk next;                                  // 次の空き領域アドレス
+  int    size;                                  // 空き領域サイズ
+};
+
+public MemBlk _memPool;
+public int _end();
+public int _lfsr;
+
+#endif

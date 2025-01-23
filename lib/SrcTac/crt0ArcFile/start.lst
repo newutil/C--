@@ -1,0 +1,59 @@
+*** 定数 ***
+
+*** BSSセグメント ***
+
+*** ヘッダ ***
+magic = 0107
+text  = 001e
+data  = 0000
+bss   = 0000
+syms  = 001c
+entry = 0000
+trsize= 0014
+drsize= 0000
+
+*** TEXTセグメント ***
+0000          	.start
+0000 a800 0000	    call    __stdlibInit        ; stdlibの初期化ルーチンを呼ぶ
+0004 a800 0000	    call    __stdioInit         ; stdio の初期化ルーチンを呼ぶ
+0008 090d 0004	    ld      g0,4,sp             ; envp を
+000c c000     	    push    g0                  ;   スタックに積む
+000e a800 0000	    call    __environInit       ; environ の初期化ルーチンを呼ぶ
+0012 c400     	    pop     g0                  ; スタックを戻す
+0014 a800 0000	    call    _main               ; ユーザプログラムのメインに飛ぶ
+0018 c000     	    push    g0                  ; メインの戻り値をスタックに積む
+001a a800 0000	    call    _exit               ; プログラムの最後まで到達した場合は終了する
+
+*** DATAセグメント ***
+
+*** 再配置表 ***
+TR領域
+Addr	Name	Type	No.
+0002	__stdlibInit	UNDF	  2
+0006	__stdioInit	UNDF	  3
+0010	__environInit	UNDF	  4
+0016	_main	UNDF	  5
+001c	_exit	UNDF	  6
+
+DR領域
+Addr	Name	Type	No.
+
+*** 名前表 ***
+No.	Name	Type	Value	Offset
+0	@start.s	TEXT	0000	0000
+1	.start	TEXT	0000	0009
+2	__stdlibInit	UNDF	0000	0010
+3	__stdioInit	UNDF	0000	001d
+4	__environInit	UNDF	0000	0029
+5	_main	UNDF	0000	0037
+6	_exit	UNDF	0000	003d
+
+*** 文字列表 ***
+Offset	String
+0000	@start.s
+0009	.start
+0010	__stdlibInit
+001d	__stdioInit
+0029	__environInit
+0037	_main
+003d	_exit

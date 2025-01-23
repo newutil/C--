@@ -1,0 +1,11 @@
+#include "environUtil.hmm"
+
+// 環境変数を２つの文字列 "名前" ， "値" を用いて設定
+// （overwrite が false で既に同名の環境変数が存在するなら何もしない）
+public boolean setEnv(char[] name, char[] value, boolean overwrite) {
+  if (strChr(name, '=') >= 0) {                             // nameが'='を含む
+    errno = EINVAL;                                         //  errnoを変更して
+    return true;                                            //   エラー終了
+  }
+  return _setNEnv(name, strLen(name), value, overwrite);     // 追加・上書きする
+}

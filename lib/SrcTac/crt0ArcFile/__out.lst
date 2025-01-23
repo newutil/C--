@@ -1,0 +1,39 @@
+*** 定数 ***
+
+*** BSSセグメント ***
+
+*** ヘッダ ***
+magic = 0107
+text  = 000c
+data  = 0000
+bss   = 0000
+syms  = 0008
+entry = 0000
+trsize= 0000
+drsize= 0000
+
+*** TEXTセグメント ***
+0000          	__out                           ; void out(int p,int v);
+0000 090d 0002	        ld      g0,2,sp	        ; ポートアドレス
+0004 091d 0004	        ld      g1,4,sp	        ; 出力データ
+0008 be10     	        out     g1,g0	        ; I/O ポートへ出力する
+000a d000     	        ret
+
+*** DATAセグメント ***
+
+*** 再配置表 ***
+TR領域
+Addr	Name	Type	No.
+
+DR領域
+Addr	Name	Type	No.
+
+*** 名前表 ***
+No.	Name	Type	Value	Offset
+0	@__out.s	TEXT	0000	0000
+1	__out	TEXT	0000	0009
+
+*** 文字列表 ***
+Offset	String
+0000	@__out.s
+0009	__out

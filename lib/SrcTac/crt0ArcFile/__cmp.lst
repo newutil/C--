@@ -1,0 +1,50 @@
+*** 定数 ***
+
+*** BSSセグメント ***
+
+*** ヘッダ ***
+magic = 0107
+text  = 0018
+data  = 0000
+bss   = 0000
+syms  = 0010
+entry = 0000
+trsize= 0008
+drsize= 0000
+
+*** TEXTセグメント ***
+0000          	__uCmp                          ; int _uCmp(int a, int b);
+0000          	__aCmp                          ; int _aCmp(void[] a, void[] b);
+0000 090d 0002	        ld      g0,2,sp
+0004 290d 0004	        cmp     g0,4,sp
+0008 0d01     	        ld      g0,#1
+000a a0c0 0016	        jhi     .L1
+000e 0d00     	        ld      g0,#0
+0010 a000 0016	        jz      .L1
+0014 0d0f     	        ld      g0,#-1
+0016 d000     	.L1     ret
+
+*** DATAセグメント ***
+
+*** 再配置表 ***
+TR領域
+Addr	Name	Type	No.
+000c	.L1	TEXT	  3
+0012	.L1	TEXT	  3
+
+DR領域
+Addr	Name	Type	No.
+
+*** 名前表 ***
+No.	Name	Type	Value	Offset
+0	@__cmp.s	TEXT	0000	0000
+1	__uCmp	TEXT	0000	0009
+2	__aCmp	TEXT	0000	0010
+3	.L1	TEXT	0016	0017
+
+*** 文字列表 ***
+Offset	String
+0000	@__cmp.s
+0009	__uCmp
+0010	__aCmp
+0017	.L1

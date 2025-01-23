@@ -45,7 +45,7 @@ public int _open(char[] path, int mode);
 public int _stat(char[] path, Stat stat);
 
 // path を絶対パスに変換して返す。呼び出し側で free() する必要がある。
-char[] newAbsPath(char[] path) {
+public char[] _newAbsPath(char[] path) {
   char[] buf = cMalloc(BUF);
   if (absPath(path, buf, BUF)) {
     free(buf);

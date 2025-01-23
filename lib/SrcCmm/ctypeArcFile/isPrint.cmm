@@ -1,0 +1,4 @@
+// 表示可能な文字か？
+public boolean isPrint(char c) {
+  return 0x20<=ord(c);
+}

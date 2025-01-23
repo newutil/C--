@@ -1,0 +1,58 @@
+#include <stdio.hmm>
+#include <errno.hmm>
+
+char[][] errList = {                            // エラーメッセージリスト
+  "Undefined error",                            // エラー番号 0 は存在しない
+
+  // カーネルまたはサーバが検知するエラー
+  "Invalid file name",                          // -1  ファイル名が不正
+  "No such file or directrory",                 // -2  ファイルが存在しない
+  "File exists",                                // -3  同名ファイルが存在する
+  "File is opened",                             // -4  オープンされている
+  "File table overflow",                        // -5  システムのオープン超過
+  "Bad file number",                            // -6  ファイル記述子が不正
+  "No space left on device",                    // -7  デバイスに空き領域が不足
+  "Bad path",                                   // -8  パスが不正
+  "Bad mode",                                   // -9  モードが一致しない
+  "Bad attribute",                              // -10 ファイルの属性が不正
+  "Directory is not empty",                     // -11 ディレクトリが空でない
+  "Invalid argument",                           // -12 引数が不正
+  "Process table overflow",                     // -13 プロセスが多すぎる
+  "Bad EXE file",                               // -14 EXE ファイルが不正
+  "Bad MAGIC number",                           // -15 不正なマジック番号
+  "Too many open files",                        // -16 プロセス毎のオープン超過
+  "No children",                                // -17 子プロセスが存在しない
+  "No zombie children",                         // -18 ゾンビの子が存在しない
+  "Not enough memory",                          // -19 十分な空き領域が無い
+  "Try again",                                  // -20 再実行要求
+
+  // 例外ハンドラが検知するユーザプロセスのエラー
+  "Invalid system call number",                 // -21 システムコール番号が不正
+  "Zero division",                              // -22 ゼロ割り算
+  "Privilege violation",                        // -23 特権例外
+  "Illegal instruction",                        // -24 不正命令
+  "Memory violation",                           // -25 メモリ保護違反
+
+  // ライブラリ(ユーザプロセス自身)が検知するエラー
+  "Stack overflow",                             // -26 スタックオーバーフロー
+  "stdio: Bad open mode",                       // -27 O_RDONLYにfputc/
+                                                //     O_WRONLYにfgetc
+  "stdio: Bad file pointer",                    // -28 不正な fp が使用された
+  "fgetc: EOF was ignored",                     // -29 fgetc前にEOFチェック必要
+  "fopen: Too many open files",                 // -30 プロセス毎のオープン超過
+  "fclose: Standard i/o should not be closed",  // -31 標準ioはクローズできない
+  "fprintf: Invalid conversion",                // -32 書式文字列に不正な変換
+  "malloc: Insufficient memory",                // -33 ヒープ領域が不足
+  "free: Bad address"                           // -34 mallocした領域ではない
+};
+
+public void _perror(char[] msg, int err) {
+  if (err<ELAST || 0<=err) err = 0;             // 不正なerrは Undefined error
+  if (msg!=null && msg[0]!='\0')                // msg があるなら
+    fprintf(stderr, "%s: ", msg);               // "xxxx: "と表示
+  fprintf(stderr, "%s\n", errList[-err]);       // エラーメッセージを表示
+}
+
+public void perror(char[] msg) {                // 普通はこの関数を使う
+  _perror(msg, errno);
+}

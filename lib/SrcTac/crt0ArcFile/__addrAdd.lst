@@ -1,0 +1,38 @@
+*** 定数 ***
+
+*** BSSセグメント ***
+
+*** ヘッダ ***
+magic = 0107
+text  = 000a
+data  = 0000
+bss   = 0000
+syms  = 0008
+entry = 0000
+trsize= 0000
+drsize= 0000
+
+*** TEXTセグメント ***
+0000          	__addrAdd                       ; void[] _addrAdd(void[] a, int i);
+0000 090d 0002	        ld      g0,2,sp
+0004 190d 0004	        add     g0,4,sp
+0008 d000     	        ret
+
+*** DATAセグメント ***
+
+*** 再配置表 ***
+TR領域
+Addr	Name	Type	No.
+
+DR領域
+Addr	Name	Type	No.
+
+*** 名前表 ***
+No.	Name	Type	Value	Offset
+0	@__addrAdd.s	TEXT	0000	0000
+1	__addrAdd	TEXT	0000	000d
+
+*** 文字列表 ***
+Offset	String
+0000	@__addrAdd.s
+000d	__addrAdd

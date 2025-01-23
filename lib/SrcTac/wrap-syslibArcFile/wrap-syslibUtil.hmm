@@ -1,0 +1,11 @@
+#ifndef WRAPSYSLIB_H
+#define WRAPSYSLIB_H
+
+#include <stdio.hmm>
+#include <syslib.hmm>
+#include <stdlib.hmm>
+#include <errno.hmm>
+
+public char[] _newAbsPath(char[] path);
+
+#endif

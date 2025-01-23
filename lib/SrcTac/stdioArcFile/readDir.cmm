@@ -1,0 +1,29 @@
+#include <stdio.hmm>
+#include <syslib.hmm>
+
+#define wordLE(b, i) ((ord((b)[(i)+1])<<8) | ord((b)[i]))
+char[] buf = array(32);
+
+public int readDir(int fd, Dir dir) {
+  int r;
+  while ((r=read(fd, buf, 32))>0) {            // EOF まで
+    char flag = buf[0];                        //   エントリの先頭１バイト
+    int  attr = ord(buf[11]);                  //   属性
+    if (flag=='\x00') return 0;                //   この先に有効エントリは無い
+    if (flag!='\xe5' &&                        //   有効なエントリでかつ
+        (attr & 0x0a)==0) {                    //   通常ファイルかディレクトリ
+      for (int i=0; i<11; i=i+1)               //     ファイル名をコピー
+        dir.name[i]=buf[i];
+      if (flag=='\x05') {                      //     先頭バイトの0x05は
+        dir.name[0]='\xe5';                    //       SJISの0xe5にする
+      }
+      dir.name[11]='\0';                       //     ファイル名を完成させる
+      dir.attr = attr;                         //     属性
+      dir.clst = wordLE(buf, 26);              //     先頭クラスタ番号
+      dir.lenH = wordLE(buf, 30);              //     ファイルサイズ上位16bit
+      dir.lenL = wordLE(buf, 28);              //     ファイルサイズ下位16bit
+      return 1;
+    }
+  }
+  return r;
+}

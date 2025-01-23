@@ -1,0 +1,16 @@
+#include <stdio.hmm>
+
+// 文字列を入力する
+public char[] fgets(char[] str, int n, FILE fp) {
+  int i = 0;                                    // 入力した文字数
+  n = n - 1;                                    // '\0'の場所を作る
+  while (i<n && !feof(fp)) {
+    char c = str[i] = fgetc(fp);
+    i = i + 1;
+    if (c=='\n')  break;                        // 改行を入力した
+  }
+  str[i]='\0';
+
+  if (i==0) str = null;                         // EOFかエラー
+  return str;
+}

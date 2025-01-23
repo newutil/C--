@@ -1,0 +1,19 @@
+#include "stdioUtil.hmm"
+
+// ファイル（ストリーム）に1文字書き込む
+char[] fputcBuf = array(1);                     // バッファリングしない場合使う
+public boolean fputc(char c, FILE fp) {
+  _chkFp(fp);                                   // 妥当な fp かチェックする
+  if (fp.mode==O_RDONLY) _exit(EUMODE);         // O_RDONLYモードにfputcできない
+  if (fp.err) return true;                      // すでにエラーになっている
+  if (fp.buf==null) {                           // バッファがない
+    fputcBuf[0] = c;                            //   別のバッファに格納して
+    ttyWrite(fputcBuf, 1);                      //   コンソールに送信
+  } else {                                      // バッファがある
+    fp.buf[fp.cnt] = c;                         //   バッファに追加する
+    fp.cnt = fp.cnt + 1;
+    if (fp.cnt>=fp.size || fp.tty && c=='\n')   //   バッファが一杯か改行で
+      fflush(fp);                               //      write する
+  }
+  return fp.err;
+}

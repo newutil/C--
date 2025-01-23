@@ -1,0 +1,73 @@
+/*
+ * Programing Language C-- "Compiler"
+ *    Tokuyama kousen Advanced educational Computer.
+ *
+ * Copyright (C) 2016 - 2021 by
+ *                      Dept. of Computer Science and Electronic Engineering,
+ *                      Tokuyama College of Technology, JAPAN
+ *
+ *   上記著作権者は，Free Software Foundation によって公開されている GNU 一般公
+ * 衆利用許諾契約書バージョン２に記述されている条件を満たす場合に限り，本ソース
+ * コード(本ソースコードを改変したものを含む．以下同様)を使用・複製・改変・再配
+ * 布することを無償で許諾する．
+ *
+ *   本ソースコードは＊全くの無保証＊で提供されるものである。上記著作権者および
+ * 関連機関・個人は本ソースコードに関して，その適用可能性も含めて，いかなる保証
+ * も行わない．また，本ソースコードの利用により直接的または間接的に生じたいかな
+ * る損害に関しても，その責任を負わない．
+ *
+ *
+ */
+
+/*
+ * lib/stdio.cmm : TacOS 用の入出力ルーチン
+ *
+ * 2021.03.18 : fillBuf() で fseek 後などで再度読めた場合は eof 解除
+ * 2021.01.12 : cMallocを使用するように変更
+ * 2020.12.11 : EAGAIN 追加
+ * 2019.11.18 : fsize() が stat システムコールを使用するように変更
+ * 2019.10.18 : ttyRead/ttyWrite は '\0' に依存しないのでバッファを１短く
+ * 2019.10.10 : TacOSとの整合を取るため、fillBuf(), fputc(), fflush()を修正
+ * 2019.03.14 : fputs()，puts()の型をbooleanに変更
+ * 2019.03.11 : subStr()を使用しないようにfsize()を書き換え
+ * 2019.01.10 : perror にエラー追加（EMEMVIO）
+ * 2018.12.03 : readDir が 0x05 のエントリを無視するバグ修正
+ * 2018.02.22 : fsize 追加
+ * 2018.02.20 : fseek 追加
+ * 2016.02.25 : TacOS の usr/lib/lib.cmm をもとに作成
+ *
+ * $Id$
+ */
+
+#include "stdioUtil.hmm"
+#include <sys/fs.hmm>
+
+public FILE[] _allFiles = array(3+FMAX);   // オープンファイルの一覧(stdin,out,err含む)
+
+// stdin 用のFILE構造体とバッファ
+char[] stdinBuf = array(TSIZ);
+public FILE stdin  = {-1, O_RDONLY,  null, TSIZ, 0, 0, true, false, false, 0};
+
+// stdout 用のFILE構造体とバッファ
+char[] stdoutBuf = array(TSIZ);
+public FILE stdout = {-2, O_WRONLY, null, TSIZ, 0, 0, true, false, false, 1};
+
+// stderr 用のFILE構造体(stderr はバッファリングしない)
+public FILE stderr = {-3, O_WRONLY, null, 0, 0, 0, true, false, false, 2};
+
+// stdio の初期化ルーチン
+public void _stdioInit() {
+  stdin.buf = stdinBuf;
+  _allFiles[0] = stdin;
+  stdout.buf = stdoutBuf;
+  _allFiles[1] = stdout;
+  _allFiles[2] = stderr;                         // stderr はバッファリングしない
+}
+
+// 妥当な fp か判定する
+public void _chkFp(FILE fp) {
+  if (fp==null || fp.slot<0 || 3+FMAX<=fp.slot
+      || _allFiles[fp.slot]!=fp)                 // 怪しい fp なら
+    _exit(EUBADF);                              // エラー終了する
+}                                               // (再帰にならないように_exit)
+
