@@ -7,7 +7,7 @@ public char[][] environ;
 // environ 確保済みの配列サイズ
 public int _capacity;
 
-public Stat sta = {0,0,0,0};
+//public Stat sta = {0,0,0,0};
 
 // 環境変数の初期化
 public void _environInit(char[][] envp) {

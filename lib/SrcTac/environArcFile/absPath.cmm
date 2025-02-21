@@ -49,7 +49,7 @@ void delDotDotDir(char[] path) {
 }
 
 // 絶対パスを取得する。
-
+Stat _sta = {0,0,0,0};
 public boolean absPath(char[] path, char[] buf, int bufSiz) {
   if (path[0] == '/') {                                     // 1文字目が '/'
     strCpy(buf, "/");                                       //   "/"から始める

@@ -14,7 +14,7 @@ public char[][] environ;
 // environ 確保済みの配列サイズ
 public int _capacity;
 
-public Stat _sta;
+//public Stat _sta;
 
 public int _envIndex(char[] name, int len);
 

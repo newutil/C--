@@ -1,5 +1,6 @@
 #include "environUtil.hmm"
 
+Stat _sta = {0,0,0,0};
 #define BUF 80
 public boolean chDir(char[] path) {
   boolean err = false;
